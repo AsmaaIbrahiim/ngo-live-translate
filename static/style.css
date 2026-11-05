@@ -1,0 +1,609 @@
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #e9eefb;
+  --bg-glow-1: rgba(37, 99, 235, 0.10);
+  --bg-glow-2: rgba(13, 148, 136, 0.10);
+  --bg-glow-3: rgba(124, 58, 237, 0.09);
+  --card: #ffffff;
+  --card-soft: #f6f8fd;
+  --ink: #0f172a;
+  --ink-2: #4a5a72;
+  --ink-3: #94a3b8;
+  --line: #e3e9f4;
+  --line-soft: #eef2f9;
+  --avatar-bg: #0d1b2a;
+
+  --teal: #0e7490;
+  --teal-2: #0891b2;
+  --blue: #2563eb;
+  --blue-2: #3b82f6;
+  --violet: #7c3aed;
+  --violet-2: #9333ea;
+  --emerald: #0d9488;
+  --emerald-2: #14b8a6;
+  --rose: #f43f5e;
+  --rose-2: #e11d48;
+
+  --radius: 18px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 2px 6px rgba(15, 23, 42, 0.06), 0 14px 34px rgba(15, 23, 42, 0.08);
+  --shadow-pill: 0 4px 14px rgba(15, 23, 42, 0.12);
+
+  --col-font: 2.1rem;
+  --dock-h: 84px;
+  --top-h: 68px;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0f1d;
+  --bg-glow-1: rgba(59, 130, 246, 0.16);
+  --bg-glow-2: rgba(20, 184, 166, 0.13);
+  --bg-glow-3: rgba(147, 51, 234, 0.14);
+  --card: #141c2f;
+  --card-soft: #101827;
+  --ink: #f1f5f9;
+  --ink-2: #aebbd0;
+  --ink-3: #6d7d97;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.45), 0 16px 40px rgba(0, 0, 0, 0.4);
+  --shadow-pill: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Tajawal", "Inter", -apple-system, "Segoe UI", "Geeza Pro", sans-serif;
+}
+
+body.booted { transition: background 0.4s ease, color 0.4s ease; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
+  background:
+    radial-gradient(circle at 18% 22%, var(--bg-glow-1), transparent 42%),
+    radial-gradient(circle at 82% 26%, var(--bg-glow-3), transparent 42%),
+    radial-gradient(circle at 50% 92%, var(--bg-glow-2), transparent 46%);
+}
+
+body.booted::before { animation: drift 30s ease-in-out infinite alternate; }
+
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(2%, -2%, 0) scale(1.05); }
+}
+
+/* ---------- avatar / brand ---------- */
+
+.avatar {
+  flex: none;
+  overflow: hidden;
+  background: var(--avatar-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.avatar--lg { width: 104px; height: 104px; border-radius: 26px; box-shadow: var(--shadow-md); }
+.avatar--sm { width: 34px; height: 34px; border-radius: 11px; }
+
+.brand-name { font-size: 0.92rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+.powered-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.powered-label--inline { letter-spacing: 0.06em; white-space: nowrap; }
+
+/* ---------- splash ---------- */
+
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  opacity: 1;
+  transition: opacity 0.55s ease, visibility 0s linear 0.55s;
+}
+
+body.booted #splash { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.splash-inner > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body.revealed .splash-inner > * { opacity: 1; transform: translateY(0); }
+body.revealed .splash-inner > *:nth-child(1) { transition-delay: 0.00s; }
+body.revealed .splash-inner > *:nth-child(2) { transition-delay: 0.08s; }
+body.revealed .splash-inner > *:nth-child(3) { transition-delay: 0.16s; }
+body.revealed .splash-inner > *:nth-child(4) { transition-delay: 0.22s; }
+body.revealed .splash-inner > *:nth-child(5) { transition-delay: 0.30s; }
+
+.splash-name { font-size: 1.15rem; font-weight: 700; color: var(--ink); margin-top: 4px; }
+
+.splash-title {
+  margin: 10px 0 0;
+  font-size: 2.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.splash-sub {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-family: "Inter", sans-serif;
+}
+
+.splash-langs { display: flex; gap: 8px; margin-top: 12px; }
+
+.lang-pill {
+  font-size: 0.86rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 999px;
+  color: #fff;
+}
+.lang-pill--en { background: linear-gradient(135deg, var(--blue-2), var(--blue)); }
+.lang-pill--ar { background: linear-gradient(135deg, var(--emerald-2), var(--emerald)); }
+.lang-pill--de { background: linear-gradient(135deg, var(--violet-2), var(--violet)); }
+
+/* ---------- top bar ---------- */
+
+#topbar {
+  position: relative;
+  z-index: 5;
+  height: var(--top-h);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.tb-group { display: flex; align-items: center; gap: 8px; }
+.tb-group--end { margin-inline-start: auto; }
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: var(--card-soft);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.icon-btn svg { width: 20px; height: 20px; }
+.icon-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); color: var(--ink); }
+.icon-btn:active { transform: translateY(0); }
+
+.icon-btn--accent {
+  background: linear-gradient(135deg, var(--teal-2), var(--teal));
+  border-color: transparent;
+  color: #fff;
+}
+.icon-btn--accent:hover { color: #fff; }
+
+.ic-sun { display: none; }
+[data-theme="dark"] .ic-moon { display: none; }
+[data-theme="dark"] .ic-sun { display: block; }
+
+.seg {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: var(--card-soft);
+  overflow: hidden;
+}
+.seg button {
+  height: 100%;
+  padding: 0 13px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.seg button:hover { background: var(--line-soft); color: var(--ink); }
+.seg-div { width: 1px; height: 20px; background: var(--line); }
+
+.tb-title {
+  position: absolute;
+  inset-inline: 0;
+  text-align: center;
+  pointer-events: none;
+}
+.tb-title-main { font-size: 1.06rem; font-weight: 700; color: var(--ink); }
+.tb-title-sub {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------- columns ---------- */
+
+/* The page is RTL, but the columns read EN | AR | DE left-to-right.
+   Each .col-body carries its own dir attribute, so text still flows right. */
+#columns {
+  position: relative;
+  z-index: 2;
+  direction: ltr;
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  height: calc(100vh - var(--top-h) - var(--dock-h));
+}
+
+.column {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.4s ease, border-color 0.4s ease, flex-basis 0.35s ease;
+}
+
+/* A collapsed column folds down to a rail. Its language is also dropped from
+   the session list, so nothing is translated for a column nobody is reading. */
+.column.collapsed {
+  flex: 0 0 60px;
+  background: var(--card-soft);
+}
+.column.collapsed .col-body { display: none; }
+.column.collapsed .col-head {
+  flex-direction: column;
+  height: 100%;
+  padding: 14px 0;
+  gap: 14px;
+  border-bottom: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.column.collapsed .col-name {
+  writing-mode: vertical-rl;
+  font-size: 1rem;
+  color: var(--ink-2);
+}
+.column.collapsed .col-live { margin-inline-start: 0; }
+.column.collapsed .col-fold { margin-block-start: auto; transform: rotate(180deg); }
+
+/* Delay list matches transition-property order, so only the intro is
+   staggered — the active-column glow stays instant. */
+body.booted .column { opacity: 1; transform: translateY(0); }
+body.booted #col-wrap-en { transition-delay: 0.05s, 0.05s, 0s, 0s; }
+body.booted #col-wrap-ar { transition-delay: 0.12s, 0.12s, 0s, 0s; }
+body.booted #col-wrap-de { transition-delay: 0.19s, 0.19s, 0s, 0s; }
+
+/* The accent lifts a shade in dark mode; keeping it in a variable means the
+   settle animation reads it live instead of needing a second keyframe set. */
+.column { --acc-live: var(--acc); }
+[data-theme="dark"] .column { --acc-live: var(--acc-2); }
+
+#col-wrap-en { --acc: #2563eb; --acc-2: #3b82f6; --acc-bd: rgba(37, 99, 235, 0.45);  --acc-ring: rgba(37, 99, 235, 0.16);  --acc-sh: rgba(37, 99, 235, 0.32); }
+#col-wrap-ar { --acc: #0d9488; --acc-2: #14b8a6; --acc-bd: rgba(13, 148, 136, 0.45); --acc-ring: rgba(13, 148, 136, 0.16); --acc-sh: rgba(13, 148, 136, 0.32); }
+#col-wrap-de { --acc: #7c3aed; --acc-2: #9333ea; --acc-bd: rgba(124, 58, 237, 0.45); --acc-ring: rgba(124, 58, 237, 0.16); --acc-sh: rgba(124, 58, 237, 0.32); }
+
+body.booted .column.active {
+  border-color: var(--acc-bd);
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--acc-ring);
+}
+
+.col-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--card);
+}
+
+.col-chip {
+  font-family: "Inter", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #fff;
+  padding: 5px 11px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--acc-2), var(--acc));
+  box-shadow: 0 3px 10px var(--acc-sh);
+}
+
+.col-name { font-size: 1.12rem; font-weight: 700; color: var(--ink); }
+
+.col-fold {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.col-fold svg { width: 17px; height: 17px; }
+.col-fold:hover { background: var(--line-soft); color: var(--ink); }
+
+.col-live {
+  margin-inline-start: auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 0.3s ease;
+}
+.column.active .col-live {
+  background: var(--acc);
+  animation: livePulse 1.4s ease-out infinite;
+}
+
+@keyframes livePulse {
+  0%   { box-shadow: 0 0 0 0 var(--acc-ring); }
+  100% { box-shadow: 0 0 0 11px rgba(0, 0, 0, 0); }
+}
+
+/* No scroll-behavior:smooth here — it fights the per-frame follow scroll and
+   makes the view lag behind the speaker. app.js batches scrolls via rAF. */
+.col-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px 28px;
+  font-size: var(--col-font);
+  line-height: 1.62;
+  color: var(--ink);
+  word-wrap: break-word;
+}
+
+.col-body::-webkit-scrollbar { width: 8px; }
+.col-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+
+#col-ar { font-size: calc(var(--col-font) * 1.06); }
+
+.col-empty { color: var(--ink-3); font-size: 1rem; font-weight: 500; }
+
+/* ---------- transcript text ----------
+   A line is provisional while the speaker is still inside it, then the
+   context-aware rewrite crossfades over the raw fragments in place. Only the
+   provisional layer ever carries hesitations and word-for-word phrasing. */
+
+.line {
+  margin: 0 0 0.5em;
+  animation: lineIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes lineIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Still being said: readable, but visibly not the finished text. */
+.line--draft { color: var(--ink-2); }
+
+.chunk { animation: chunkIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes chunkIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* The rewrite resolving into place: the raw words blur away and the clean
+   sentence arrives in the column's accent, then cools into body text. */
+.line--in {
+  animation: refineIn 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+             lineSettle 2.2s ease-out both;
+}
+
+@keyframes refineIn {
+  0%   { opacity: 0.15; filter: blur(3px); transform: scale(0.995); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; filter: blur(0); transform: none; }
+}
+
+@keyframes lineSettle {
+  0%, 30% { color: var(--acc-live); }
+  100%    { color: var(--ink); }
+}
+
+/* Nothing but filler was said — take the fragments back off the screen. */
+.line--out {
+  animation: lineOut 0.3s ease-in both;
+  pointer-events: none;
+}
+
+@keyframes lineOut {
+  from { opacity: 1; }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+.caret {
+  display: inline-block;
+  width: 3px;
+  height: 1.05em;
+  vertical-align: -0.16em;
+  margin-inline-start: 3px;
+  border-radius: 2px;
+  background: var(--acc-live);
+  animation: blink 1.1s ease-in-out infinite;
+}
+
+.line:not(.line--draft) .caret { display: none; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}
+
+/* ---------- dock ---------- */
+
+#dock {
+  position: relative;
+  z-index: 5;
+  height: var(--dock-h);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -2px 14px rgba(15, 23, 42, 0.05);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-pill);
+  transition: transform 0.16s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.pill:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.pill:active { transform: translateY(0) scale(0.985); }
+
+.pill--start { background: linear-gradient(135deg, var(--teal-2), var(--blue)); }
+.pill--stop  { background: linear-gradient(135deg, #fb7185, var(--rose-2)); }
+
+.pill-ic { display: grid; place-items: center; width: 22px; height: 22px; }
+.pill-ic svg { width: 19px; height: 19px; }
+.ic-stop { display: none; }
+.pill--stop .ic-play { display: none; }
+.pill--stop .ic-stop { display: block; }
+.pill--stop .pill-ic { animation: recPulse 1.3s ease-in-out infinite; }
+
+@keyframes recPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.mic {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 50px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card-soft);
+  color: var(--ink-3);
+}
+.mic-ic { width: 20px; height: 20px; flex: none; }
+
+.bars { display: flex; align-items: center; gap: 3px; height: 26px; }
+.bars i {
+  display: block;
+  width: 3px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: height 0.09s linear;
+}
+
+.status {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  transition: background 0.3s ease;
+}
+.status.is-live .status-dot {
+  background: var(--emerald-2);
+  animation: dotPulse 1.5s ease-in-out infinite;
+}
+.status.is-err .status-dot { background: var(--rose); }
+.status.is-err { color: var(--rose-2); }
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@media (max-width: 1100px) {
+  .tb-title { display: none; }
+  :root { --col-font: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
